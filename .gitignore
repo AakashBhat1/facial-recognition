@@ -1,0 +1,78 @@
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Tool configs
+.claude/
+.codex/
+CLAUDE.md
+
+# Playwright MCP artifacts (console logs, page snapshots)
+.playwright-mcp/
+
+# Environment / secrets
+.env
+*.env
+
+# Test artifacts
+.coverage
+backend/.coverage
+htmlcov/
+
+# Runtime database
+backend/data/*.db
+
+# Runtime logs
+logs/
+*.log
+backend/logs/
+
+# Generated ML data (regenerate via scripts)
+backend/data/*.csv
+
+# All ML model binaries — regenerated via scripts or downloaded out-of-band.
+# GitHub rejects files >100 MB and warns >50 MB; the YOLO anti-spoof weight is ~84 MB.
+backend/models_ml/
+!backend/models_ml/.gitkeep
+
+# ML model weight files anywhere in tree — keep folders, ignore the binaries.
+*.pt
+*.pth
+*.onnx
+*.h5
+*.pkl
+*.bin
+*.safetensors
+*.ckpt
+
+# Face embedding training scratch (untracked, hundreds of MB of checkpoints/data)
+face_model_scratch/
+
+# InsightFace model cache
+~/.insightface/
+
+# Internal documentation (drafts, blueprints, working notes — not for public repo)
+docs/
+
+# Webcam captures (demo artifacts)
+demo/capture/
+
+# Stray dev screenshots
+enroll_swagger_ui.png
+*.swagger*.png
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
