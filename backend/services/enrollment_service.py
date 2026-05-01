@@ -191,7 +191,7 @@ def get_all_users_with_embeddings(db: Session) -> list[dict]:
     return result
 
 
-def _extract_all_embeddings(images: list[bytes]) -> list[list[float]]:
+def _extract_all_embeddings(images: list[bytes]) -> tuple[list[list[float]], int]:
     """Extract embeddings from images + augmented copies.
 
     Shared by ``enroll_user`` and ``re_enroll_user``.

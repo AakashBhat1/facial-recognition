@@ -31,8 +31,10 @@ def _build_face_analysis(model_name: str, root: str | None = None) -> Any:
         kwargs["root"] = root
 
     model = FaceAnalysis(**kwargs)
+    # ctx_id=-1 forces CPU. Deployment target is CPU-only kiosk hardware,
+    # so this matches the configured CPUExecutionProvider explicitly.
     model.prepare(
-        ctx_id=0,
+        ctx_id=-1,
         det_thresh=config.FACE_DETECTION_THRESHOLD,
         det_size=(config.FACE_DET_SIZE, config.FACE_DET_SIZE),
     )

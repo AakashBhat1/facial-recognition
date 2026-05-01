@@ -157,6 +157,23 @@ def recognize(base_url: str, locker_id: str = "L001") -> dict | None:
             print(f"[recognize] ACCESS GRANTED — Welcome, {user_name}! (score: {score:.3f})")
         else:
             print(f"[recognize] ACCESS DENIED (score: {score:.3f})")
+            # Diagnostic: show per-frame gate results so we can see what rejected
+            print(f"[recognize] frames_processed={body.get('frames_processed')} "
+                  f"passed_quality={body.get('frames_passed_quality')} "
+                  f"passed_anomaly={body.get('frames_passed_anomaly')}")
+            for fr in body.get("frame_results", []):
+                print(f"  frame {fr.get('frame_index')}: "
+                      f"quality={fr.get('quality_passed')} "
+                      f"reasons={fr.get('rejection_reasons')} "
+                      f"antispoof={fr.get('antispoof_passed')} "
+                      f"anomaly={fr.get('anomaly_passed')} "
+                      f"score={fr.get('score')}")
+            live = body.get("liveness")
+            if live:
+                print(f"  liveness: passed={live.get('passed')} "
+                      f"blink={live.get('blink_detected')} "
+                      f"head_movement={live.get('head_movement_detected')} "
+                      f"reason={live.get('reason')}")
         print(f"[recognize] locker_action={action}, log_id={body.get('log_id')}")
         return body
     else:

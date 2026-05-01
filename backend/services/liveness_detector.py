@@ -27,26 +27,31 @@ class LivenessResult:
     reason: str
 
 
-# 106-point landmark indices for left and right eye (InsightFace convention).
-# Left eye: points 33-37 (upper), 87-91 (lower) — simplified to 6 points.
-_LEFT_EYE_106 = [33, 34, 35, 36, 37, 38]   # upper + lower eyelid
-_RIGHT_EYE_106 = [42, 43, 44, 45, 46, 47]
+# 106-point landmark indices for left and right eye (InsightFace 2d106det).
+# Empirically verified against insightface buffalo_s on insightface/data/images/t1.jpg:
+#   - Indices 33-42 (10 pts) cluster at the face's right eye.
+#   - Indices 87-95 (9 pts) cluster at the face's left eye.
+#   - Indices 43-51 and 96-105 are the eyebrows (NOT eyes — prior code used them
+#     by mistake, which made blink detection essentially never fire).
+_RIGHT_EYE_106 = list(range(33, 43))
+_LEFT_EYE_106 = list(range(87, 96))
 
 
 def _eye_aspect_ratio_106(landmarks: np.ndarray, eye_indices: list[int]) -> float:
-    """EAR from 6 eye-corner points of 106-point landmarks.
+    """EAR-equivalent: bounding-box height/width over all eye landmarks.
 
-    EAR = (|p2-p6| + |p3-p5|) / (2 * |p1-p4|)
+    Open eyes yield ~0.25-0.40, blinks drop below ~0.15. This avoids depending
+    on a specific 6-point ordering, which the JD-AI 106-point layout does not
+    document and which differs between the two eyes (10 vs 9 points).
     """
     pts = landmarks[eye_indices]
-    if len(pts) < 6:
-        return 1.0  # safe default — open eye
-    vertical_1 = np.linalg.norm(pts[1] - pts[5])
-    vertical_2 = np.linalg.norm(pts[2] - pts[4])
-    horizontal = np.linalg.norm(pts[0] - pts[3])
-    if horizontal < 1e-6:
+    if len(pts) < 4:
+        return 1.0  # safe default — assume open
+    width = float(pts[:, 0].max() - pts[:, 0].min())
+    height = float(pts[:, 1].max() - pts[:, 1].min())
+    if width < 1e-6:
         return 1.0
-    return float((vertical_1 + vertical_2) / (2.0 * horizontal))
+    return height / width
 
 
 def compute_ear(landmarks: np.ndarray) -> float:
