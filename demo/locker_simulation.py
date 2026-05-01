@@ -201,26 +201,44 @@ def api_list_users(api_base: str) -> list[str]:
         return []
 
 
-def api_enroll(api_base: str, name: str, frames: list[bytes]) -> tuple[bool, str]:
+def api_find_user_id(api_base: str, name: str) -> int | None:
+    try:
+        resp = requests.get(f"{api_base}/api/users", timeout=4)
+        resp.raise_for_status()
+    except requests.exceptions.RequestException:
+        return None
+
+    target = name.strip().lower()
+    for user in resp.json():
+        if str(user.get("name", "")).strip().lower() == target:
+            user_id = user.get("id")
+            return int(user_id) if user_id is not None else None
+    return None
+
+
+def api_enroll(api_base: str, name: str, frames: list[bytes]) -> tuple[bool, dict | str]:
     files = [("images", (f"face{i}.jpg", buf, "image/jpeg")) for i, buf in enumerate(frames)]
     try:
-        resp = requests.post(f"{api_base}/api/enroll/", params={"name": name}, files=files, timeout=90)
+        resp = requests.post(f"{api_base}/api/enroll", data={"name": name}, files=files, timeout=90)
     except requests.exceptions.RequestException as exc:
         return False, f"Network error: {exc}"
     if resp.status_code == 200:
         data = resp.json()
-        return True, f"Enrolled {name} ({data.get('embedding_count', 0)} embeddings)"
+        return True, {
+            "message": f"Enrolled {name} ({data.get('embedding_count', 0)} embeddings)",
+            "user_id": data.get("user_id"),
+        }
     return False, f"Enroll failed: HTTP {resp.status_code} {resp.text[:120]}"
 
 
-def api_recognize_multi(api_base: str, locker_id: str, frames: list[bytes]) -> tuple[bool, dict | str]:
+def api_recognize_multi(api_base: str, user_id: int, locker_id: str, frames: list[bytes]) -> tuple[bool, dict | str]:
     """Call the multi-frame recognize endpoint with liveness checks enabled."""
     files = [("images", (f"f{i}.jpg", buf, "image/jpeg")) for i, buf in enumerate(frames)]
     try:
         resp = requests.post(
             f"{api_base}/api/auth/recognize-multi",
             files=files,
-            params={"locker_id": locker_id, "check_liveness": "true"},
+            params={"user_id": user_id, "locker_id": locker_id, "check_liveness": "true"},
             timeout=60,
         )
     except requests.exceptions.RequestException as exc:
@@ -228,6 +246,13 @@ def api_recognize_multi(api_base: str, locker_id: str, frames: list[bytes]) -> t
     if resp.status_code != 200:
         return False, f"HTTP {resp.status_code}: {resp.text[:160]}"
     return True, resp.json()
+
+
+def api_login(api_base: str, name: str, locker_id: str, frames: list[bytes]) -> tuple[bool, dict | str]:
+    user_id = api_find_user_id(api_base, name)
+    if user_id is None:
+        return False, f"Could not find enrolled user '{name}' on backend"
+    return api_recognize_multi(api_base, user_id, locker_id, frames)
 
 
 # ---------------------------------------------------------------------------
@@ -753,9 +778,12 @@ def run_kiosk(api_base: str, capacity: int) -> None:
             frames_bundle = handle_capture_login(state, frame, key)
             if frames_bundle is not None:
                 _frames = frames_bundle
+                _slot = state.selected_slot or 0
+                _name = state.assignments.get(_slot, "")
+                _locker_id = f"L{_slot:03d}"
                 start_busy(state, "login",
                            f"Verifying {len(_frames)} frames with liveness + anti-spoof...",
-                           lambda: api_recognize_multi(api_base, "L001", _frames))
+                           lambda: api_login(api_base, _name, _locker_id, _frames))
 
         elif state.screen == "result":
             canvas = render_result(state)

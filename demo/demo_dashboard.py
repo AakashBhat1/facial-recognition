@@ -331,10 +331,10 @@ def run_e2e_checks(base_url: str, enroll_frames: list[np.ndarray], auth_frames: 
         _mark("enroll", "running")
         t0 = time.perf_counter()
         try:
-            r = client.post("/api/enroll", params={"name": user_name}, files=_files_payload(enroll_frames))
+            r = client.post("/api/enroll", data={"name": user_name}, files=_files_payload(enroll_frames))
             dt = (time.perf_counter() - t0) * 1000
             if r.status_code == 200:
-                user_id = r.json()["user"]["id"]
+                user_id = r.json()["user_id"]
                 STATE.latency_enroll_ms = dt
                 _mark("enroll", "ok", "", dt); passed += 1
             else:
@@ -353,12 +353,12 @@ def run_e2e_checks(base_url: str, enroll_frames: list[np.ndarray], auth_frames: 
         try:
             r = client.post(
                 "/api/auth/recognize-multi",
-                params={"locker_id": LOCKER_ID, "check_liveness": "false"},
+                params={"user_id": user_id, "locker_id": LOCKER_ID, "check_liveness": "false"},
                 files=_files_payload(auth_frames),
             )
             dt = (time.perf_counter() - t0) * 1000
             if r.status_code == 200:
-                matched = r.json().get("matched_user_id")
+                matched = r.json().get("user_id")
                 STATE.latency_recognize_ms = dt
                 if matched == user_id:
                     _mark("recognize", "ok", "", dt); passed += 1
