@@ -1,49 +1,49 @@
-
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
+.python-version
 
 # Virtual environments
 .venv/
+venv/
+env/
 
-# Tool configs
+# AI/IDE tool configs
 .claude/
 .codex/
+.playwright-mcp/
 CLAUDE.md
 
-# Playwright MCP artifacts (console logs, page snapshots)
-.playwright-mcp/
+# Dependency lock (uv) — optional, uncomment to track exact versions
+# uv.lock
 
 # Environment / secrets
 .env
+.env.*
 *.env
+!*.env.example
 
-# Test artifacts
-.coverage
-backend/.coverage
-htmlcov/
-
-# Runtime database
+# Databases
+*.db
+*.sqlite3
 backend/data/*.db
 
-# Runtime logs
+# Logs
 logs/
 *.log
 backend/logs/
 
-# Generated ML data (regenerate via scripts)
+# Generated data
 backend/data/*.csv
 
-# All ML model binaries — regenerated via scripts or downloaded out-of-band.
-# GitHub rejects files >100 MB and warns >50 MB; the YOLO anti-spoof weight is ~84 MB.
+# ML model binaries (regenerate via scripts or download out-of-band)
+# GitHub rejects >100 MB; YOLO anti-spoof weight is ~84 MB
 backend/models_ml/
 !backend/models_ml/.gitkeep
-
-# ML model weight files anywhere in tree — keep folders, ignore the binaries.
 *.pt
 *.pth
 *.onnx
@@ -53,26 +53,32 @@ backend/models_ml/
 *.safetensors
 *.ckpt
 
-# Face embedding training scratch (untracked, hundreds of MB of checkpoints/data)
+# Training scratch (checkpoints, large datasets)
 face_model_scratch/
 
 # InsightFace model cache
-~/.insightface/
+.insightface/
 
-# Internal documentation (drafts, blueprints, working notes — not for public repo)
+# Documentation drafts / working notes
 docs/
 
-# Webcam captures (demo artifacts)
+# Demo artifacts
 demo/capture/
 
-# Stray dev screenshots
-enroll_swagger_ui.png
+# Dev screenshots
 *.swagger*.png
+enroll_swagger_ui.png
 
-# OS files
-Thumbs.db
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# OS
 .DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
+*.iml
