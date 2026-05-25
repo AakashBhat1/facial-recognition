@@ -54,7 +54,7 @@ def _load_onnx_backend() -> bool:
 
     if not os.path.exists(config.ANTISPOOF_MODEL_PATH):
         logger.warning(
-            "Anti-spoof ONNX model not found at %s — run download_antispoof_model.py first",
+            "Anti-spoof ONNX model not found at %s — place the .onnx file there to enable.",
             config.ANTISPOOF_MODEL_PATH,
         )
         return False

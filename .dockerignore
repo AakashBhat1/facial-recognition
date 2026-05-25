@@ -1,0 +1,65 @@
+# --- Python build / cache ---
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# --- Virtualenvs ---
+.venv/
+venv/
+env/
+.python-version
+
+# --- Secrets / env files (NEVER bake) ---
+.env
+*.env
+**/.env
+**/.env.*
+
+# --- Runtime data & models (mount, don't bake) ---
+backend/data/
+backend/logs/
+logs/
+backend/models_ml/
+
+# --- Local-only training scratch (gitignored anyway) ---
+face_model_scratch/
+
+# --- Demos & mocks: not part of the backend image ---
+demo/
+mock/
+
+# --- Docs & project metadata ---
+docs/
+*.md
+README.md
+CLAUDE.md
+.codex/
+.claude/
+
+# --- Git / VCS ---
+.git/
+.gitignore
+.gitattributes
+
+# --- IDE / OS junk ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- uv / poetry lockfiles (we install from requirements.txt) ---
+uv.lock
+poetry.lock
+
+# --- Docker files themselves (avoid recursive inclusion) ---
+Dockerfile
+.dockerignore
+docker-compose*.yml

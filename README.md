@@ -98,15 +98,6 @@ Continuous Kiosk Mode
 python demo/live_demo.py live
 Locker Simulation GUI
 python demo/locker_simulation.py
-Operator Dashboard
-python demo/demo_dashboard.py
-
-Includes:
-
-Camera feed
-System health checks
-Recognition latency
-Live monitoring
 Reset Database
 
 Delete the SQLite database:
@@ -164,34 +155,25 @@ Machine Learning Detection
 
 RandomForest classifier using behavioral access features.
 
-Retrain model:
-
-python backend/scripts/retrain_model.py
 Project Structure
 backend/
 ├── api/
 ├── middleware/
 ├── models/
 ├── models_ml/
-├── scripts/
 ├── services/
 ├── config.py
 └── main.py
 
 demo/
 ├── live_demo.py
-├── locker_simulation.py
-└── demo_dashboard.py
+└── locker_simulation.py
 
 docs/
 └── project documentation
-Model Downloads
+Model Files
 
-Download anti-spoof model:
-
-python backend/scripts/download_antispoof_model.py
-
-InsightFace models download automatically during first launch.
+Place the anti-spoof model at backend/models_ml/antispoof.onnx (ONNX backend) or backend/models_ml/l_version_1_300.pt (YOLO backend). InsightFace models download automatically during first launch.
 
 Notes
 Use opencv-python instead of opencv-python-headless for GUI demos.
